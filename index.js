@@ -6,10 +6,17 @@ export async function runBot(log) {
   // baca semua akun
   const accountLines = fs.readFileSync("idpw.txt", "utf8").split("\n").filter(Boolean);
 
+  while (true) {
+  log("🔁 Mulai siklus pengecekan semua akun...");
   for (const line of accountLines) {
     const [username, password] = line.split("|");
     await jalankanAkun(username.trim(), password.trim(), log);
   }
+  log("🕐 Menunggu 10 menit sebelum mengulang...");
+  await sendTelegram("🔁 Semua akun telah dicek. Menunggu 10 menit untuk siklus berikutnya...");
+  await new Promise(r => setTimeout(r, 10 * 60 * 1000)); // 10 menit delay
+}
+
 }
 
 async function jalankanAkun(username, password, log) {
@@ -148,6 +155,8 @@ async function jalankanAkun(username, password, log) {
 
     await sendTelegram(`🎉 ${username}: Selesai semua absen`);
     log(`🎉 ${username}: Selesai semua absen`);
+    
+
 
   } catch (e) {
     log(`❌ ${username}: Error ${e.message}`);
